@@ -1,25 +1,35 @@
-// app/src/main/java/com/moodly/app/data/local/EntradaRepository.kt
+// app/src/main/java/com/moodly/app/data/local/EntradaDao.kt
 package com.moodly.app.data.local
 
+import androidx.room.*
 import com.moodly.app.data.model.EntradaDiaria
 import kotlinx.coroutines.flow.Flow
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 
-class EntradaRepository(private val dao: EntradaDao) {
+@Dao
+interface EntradaDao {
 
-    fun observarTodas(): Flow<List<EntradaDiaria>> = dao.observarTodas()
+    // Insertar o reemplazar entrada del día
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertar(entrada: EntradaDiaria)
 
-    fun observarSemana(fechaEnSemana: LocalDate = LocalDate.now()): Flow<List<EntradaDiaria>> {
-        val lunes  = fechaEnSemana.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        val domingo = lunes.plusDays(6)
-        return dao.observarSemana(lunes, domingo)
-    }
+    // Todas las entradas ordenadas por fecha descendente
+    @Query("SELECT * FROM entradas ORDER BY fecha DESC")
+    fun observarTodas(): Flow<List<EntradaDiaria>>
 
-    suspend fun guardar(entrada: EntradaDiaria) = dao.insertar(entrada)
+    // Entradas de una semana (lunes–domingo)
+    @Query("""
+        SELECT * FROM entradas
+        WHERE fecha >= :inicio AND fecha <= :fin
+        ORDER BY fecha DESC
+    """)
+    fun observarSemana(inicio: LocalDate, fin: LocalDate): Flow<List<EntradaDiaria>>
 
-    suspend fun porFecha(fecha: LocalDate): EntradaDiaria? = dao.porFecha(fecha)
+    // Una sola entrada por fecha
+    @Query("SELECT * FROM entradas WHERE fecha = :fecha LIMIT 1")
+    suspend fun porFecha(fecha: LocalDate): EntradaDiaria?
 
-    suspend fun eliminar(entrada: EntradaDiaria) = dao.eliminar(entrada)
+    // Eliminar entrada
+    @Delete
+    suspend fun eliminar(entrada: EntradaDiaria)
 }
