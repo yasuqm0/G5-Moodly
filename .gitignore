@@ -1,0 +1,26 @@
+# ── Archivos locales de Android Studio ───────────────────────────────────────
+local.properties
+*.iml
+
+# ── Carpetas generadas automáticamente ───────────────────────────────────────
+.gradle/
+build/
+app/build/
+
+# ── Configuración local del IDE (rutas de tu máquina) ────────────────────────
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.idea/modules.xml
+
+# ── Archivos de sistema ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Keystore (no subir claves privadas) ───────────────────────────────────────
+*.jks
+*.keystore
